@@ -29,7 +29,7 @@ tail -f production.log
 ### JIRA
 
 ```
-When new issues is created
+When new issue is created
 |-- filter {{issue.type}}="User Story"
 |   |-- Create card in Trello using {{jira_issue}}
 |   |-- filter {{issue.assignee}}="Anton Kuzmenko" AND {{issue.priority}}="Critical"
