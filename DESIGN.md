@@ -65,4 +65,4 @@ Example satellites:
    - JIRA action (create/update/transition/etc. an issue)
    - etc.
  - **Splitters**
-   - Basic splitter (iterates over a collection and triggers each message)
+   - Basic splitter (iterates over a collection and triggers each item as a message)
