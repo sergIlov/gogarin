@@ -38,7 +38,7 @@ When a new issue is created
 
 # Bird's-eye view
 **Space center** manages **satellites**. Satellite does one thing and does it well.
-Example Satellites:
+Example satellites:
  - **Triggers**
    - Tail trigger (`tail -f somefile`)
    - HTTP callback
