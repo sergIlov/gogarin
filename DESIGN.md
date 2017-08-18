@@ -1,6 +1,6 @@
 # Vision
 
-For **software engineers** and **business automation engineers**, whose **apps** must be **integrated with 3rd-party asap**, the **Gogarin** is an **intelligent automation** tool that **integrates databases, services, apps, and so forth** in a matter of minutes.
+For **software engineers** and **business automation engineers**, whose **apps** must be **integrated with 3rd-party asap**, the **Gogarin** is an **intelligent automation** tool that **integrates databases, services, apps** in a matter of minutes.
 
 # It Is
 
@@ -29,16 +29,15 @@ tail -f production.log
 ### JIRA
 
 ```
-When new issue is created
+When a new issue is created
 |-- filter {{issue.type}}="User Story"
-|   |-- Create card in Trello using {{jira_issue}}
+|   |-- Create card in Trello using {{issue}}
 |   |-- filter {{issue.assignee}}="Anton Kuzmenko" AND {{issue.priority}}="Critical"
 |       |-- send "{{issue.key}} - {{issue.subject}}" to anton@email.com
 ```
 
 # Bird's-eye view
-Space center manages satelites.
-Satellite does one thing and does it well.
+Space center manages satelites. Satellite does one thing and does it well.
 Example satelites:
  - Triggers
    - Tail trigger (`tail -f somefile`)
