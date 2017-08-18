@@ -15,7 +15,7 @@ For **software engineers** and **business automation engineers**, whose **apps**
 
 # Use Cases
 
-## Tail
+### Tail
 
 ```
 tail -f production.log
@@ -26,12 +26,44 @@ tail -f production.log
 |-- postgresql insert {{user}} into table clients
 ```
 
-## JIRA
+### JIRA
 
 ```
 When new issues is created
 |-- filter {{issue.type}}="User Story"
 |   |-- Create card in Trello using {{jira_issue}}
-|   |-- filter {{issue.assignee}}=Anton Kuzmenko AND {{issue.priority}}=Critical
+|   |-- filter {{issue.assignee}}="Anton Kuzmenko" AND {{issue.priority}}="Critical"
 |       |-- send "{{issue.key}} - {{issue.subject}}" to anton@email.com
 ```
+
+# Bird's-eye view
+Space center manages satelites.
+Satellite does one thing and does it well.
+Example satelites:
+ - Triggers
+   - Tail trigger (`tail -f somefile`)
+   - HTTP callback
+   - Cron trigger
+   - JIRA trigger
+   - POP3 trigger (receive emails)
+   - Twitter trigger (react on a #hashtag)
+   - and more.
+ - Filters
+   - Basic filter (`field == val`, `number >= value`, etc.)
+   - Postgresql filter (`SELECT`)
+   - Redis filter (`GET`, `HEXISTS`, `HGET`, etc.)
+   - etc.
+ - Modifiers
+   - Basic modifier (add/delete/change fields of a message)
+   - Postgresql modifier (add/delete/change fields of a message based on a `SELECT`)
+   - JIRA modifier (add/delete/change fields based on JIRA API query results)
+   - etc.
+ - Actions
+   - File action (append message to a file, create/update/delete file)
+   - Postgresql action (`INSERT`, `UPDATE`, `DELETE`)
+   - Mail action (send email)
+   - Twitter action (post a tweet)
+   - JIRA action (create/update/transition/etc. an issue)
+   - etc.
+ - Splitters
+   - Basic splitter (iterates over a collection and triggers each message)
