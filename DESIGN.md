@@ -41,7 +41,7 @@ When a new issue is created
 Example satellites:
  - **Triggers**
    - Tail trigger (`tail -f somefile`)
-   - HTTP callback
+   - HTTP callback trigger
    - Cron trigger
    - JIRA trigger
    - POP3 trigger (receive emails)
@@ -49,17 +49,17 @@ Example satellites:
    - and more.
  - **Filters**
    - Basic filter (`field == val`, `number >= value`, etc.)
-   - Postgresql filter (`SELECT`)
+   - PostgreSQL filter (`SELECT`)
    - Redis filter (`GET`, `HEXISTS`, `HGET`, etc.)
    - etc.
  - **Modifiers**
    - Basic modifier (add/delete/change fields of a message)
-   - Postgresql modifier (add/delete/change fields of a message based on a `SELECT`)
+   - PostgreSQL modifier (add/delete/change fields of a message based on a `SELECT`)
    - JIRA modifier (add/delete/change fields based on JIRA API query results)
    - etc.
  - **Actions**
    - File action (append message to a file, create/update/delete file)
-   - Postgresql action (`INSERT`, `UPDATE`, `DELETE`)
+   - PostgreSQL action (`INSERT`, `UPDATE`, `DELETE`)
    - Mail action (send email)
    - Twitter action (post a tweet)
    - JIRA action (create/update/transition/etc. an issue)
