@@ -30,6 +30,8 @@ tail -f production.log
 
 ```
 When new issues is created
-|-- filter issue_type equals "User Story"
+|-- filter {{issue.type}} "User Story"
 |   |-- Create card in Trello using {{jira_issue}}
+|   |-- filter {{issue.assignee}}=Anton Kuzmenko AND {{issue.priority}}=Critical
+|       |-- send "{{issue.key}} - {{issue.subject}}" to anton@email.com
 ```
