@@ -24,3 +24,14 @@ When a new issue is created
 |   |-- filter {{issue.assignee}}="Anton Kuzmenko" AND {{issue.priority}}="Critical"
 |       |-- send "{{issue.key}} - {{issue.subject}}" to anton@email.com
 ```
+
+# It Is
+
+1. Fast
+1. Scalable
+1. Persistent
+1. Fault-tolerant
+1. Simple
+1. Lightweight
+1. Easy to install
+1. Easy to maintain
