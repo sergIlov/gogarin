@@ -65,6 +65,4 @@ Planned support for NSQ, Kafka, Redis, RabbitMQ, SQS
 # Satellite
 
 ### Installation
-<p align="center">
-<img src="design/satellite-installation-seq.png" width=1059 height=372 alt="Satellite installation sequence diagram"/>
-</p>
+<img src="design/satellite-installation-seq.png" width=1200 height=392 alt="Satellite installation sequence diagram"/>
