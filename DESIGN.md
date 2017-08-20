@@ -41,23 +41,23 @@ Planned support for NSQ, Kafka, Redis, RabbitMQ, SQS
    - JIRA trigger
    - POP3 trigger (receive emails)
    - Twitter trigger (react on a #hashtag)
-   - and more.
+   - and more
  - **Filters**
    - Basic filter (`field == val`, `number >= value`, etc.)
    - PostgreSQL filter (`SELECT`)
    - Redis filter (`GET`, `HEXISTS`, `HGET`, etc.)
-   - etc.
+   - and more
  - **Modifiers**
    - Basic modifier (add/delete/change fields of a message)
    - PostgreSQL modifier (add/delete/change fields of a message based on a `SELECT`)
    - JIRA modifier (add/delete/change fields based on JIRA API query results)
-   - etc.
+   - and more
  - **Actions**
    - File action (append message to a file, create/update/delete file)
    - PostgreSQL action (`INSERT`, `UPDATE`, `DELETE`)
    - Mail action (send email)
    - Twitter action (post a tweet)
    - JIRA action (create/update/transition/etc. an issue)
-   - etc.
+   - and more
  - **Splitters**
    - Basic splitter (iterates over a collection and triggers each item as a message)
