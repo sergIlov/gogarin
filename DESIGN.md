@@ -68,4 +68,4 @@ Planned support for NSQ, Kafka, Redis, RabbitMQ, SQS
 <img src="design/satellite-installation-seq.png" width=1200 height=392 alt="Satellite installation sequence diagram"/>
 
 ### Pipeline
-<img src="design/satellite-pipeline-seq.png" width=851 height=314 alt="Satellite installation sequence diagram"/>
+<img src="design/satellite-pipeline-seq.png" width=1091 height=314 alt="Satellite installation sequence diagram"/>
