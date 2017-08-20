@@ -1,8 +1,8 @@
 # Bird's-eye view
-**Space center** manages **satellites**. Satellite does one thing and does it well.
-A satellite is a Go application that communicates with the space center via Redis/RabbitMQ/NSQ/Apache Kafka.
-Satellite is either a trigger, a filter, a modifier, an action, or a splitter.
-You can maximize throughput by running many instances of the same satellite on different hosts.
+_Space center_ manages _satellites_. Satellite does one thing and does it well.
+A satellite is a Go application that communicates with the space center via a _message broker_.
+Satellite is either a _trigger_, a _filter_, a _modifier_, an _action_, or a _splitter_.
+You can maximize throughput by running multiple instances of the same satellite on multiple hosts.
 
 ```
               ++++++++++++++
@@ -14,7 +14,7 @@ You can maximize throughput by running many instances of the same satellite on d
                      ▲
                      |
                      ▼
-         |--------►NSQD◄-------|
+         |---►Message broker◄--|
          ▼                     ▼
  ++++++++++++++++      ++++++++++++++++
 |     host2      |    |     host3      |
@@ -30,8 +30,10 @@ You can maximize throughput by running many instances of the same satellite on d
  ++++++++++++++++      ++++++++++++++++
  ````
 
-### Satelites
-Example satellites:
+# Message brokers
+Planned support for NSQ, Kafka, Redis, RabbitMQ, SQS
+
+# Example satellites
  - **Triggers**
    - Tail trigger (`tail -f somefile`)
    - HTTP callback trigger
