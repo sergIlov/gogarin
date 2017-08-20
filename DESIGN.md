@@ -61,3 +61,10 @@ Planned support for NSQ, Kafka, Redis, RabbitMQ, SQS
    - etc.
  - **Splitters**
    - Basic splitter (iterates over a collection and triggers each item as a message)
+
+# Satellite
+
+### Installation
+<p align="center">
+<img src="design/satellite-installation-seq.png" width=1059 height=372 alt="Satellite installation sequence diagram"/>
+</p>
