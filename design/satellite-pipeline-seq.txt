@@ -1,0 +1,12 @@
+participant JIRA Server
+participant JIRA trigger
+participant Basic filter
+participant Trello action
+
+JIRA Server-->JIRA trigger: create new issue
+JIRA trigger->Message broker: publish issue
+Note right of JIRA trigger: JIRA trigger polls the\nJIRA Server for new issues
+Message broker-->Basic filter: consume issue
+Basic filter-->Message broker: publish issue if {{issue.type}} == "User Story"
+Message broker-->Trello action: consume issue
+Trello action-->Trello action: create card in Trello
