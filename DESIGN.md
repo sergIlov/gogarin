@@ -2,6 +2,7 @@
 _Space center_ manages _satellites_. Satellite does one thing and does it well.
 A satellite is a Go application that communicates with the space center via a _message broker_.
 Satellite is either a _trigger_, a _filter_, a _modifier_, an _action_, or a _splitter_.
+The satellites are united in _missions_. A _mission_ is a set of satellites that solves one or more business tasks.
 You can maximize throughput by running multiple instances of the same satellite on multiple hosts.
 
 ```
@@ -67,5 +68,8 @@ Planned support for NSQ, Kafka, Redis, RabbitMQ, SQS
 ### Installation
 <img src="design/satellite-installation-seq.png" width=1200 height=392 alt="Satellite installation sequence diagram"/>
 
-### Pipeline
-<img src="design/satellite-pipeline-seq.png" width=1091 height=314 alt="Satellite installation sequence diagram"/>
+### Mission Flow
+<img src="design/satellite-mission-flow-seq.png" width=1091 height=314 alt="Mission flow sequence diagram"/>
+
+### Mission CRUD
+<img src="design/satellite-mission-crud-seq.png" width=787 height=262 alt="Mission CRUD sequence diagram"/>
