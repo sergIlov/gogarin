@@ -69,7 +69,7 @@ Support is planned for NSQ, Kafka, Redis, RabbitMQ, and SQS
 <img src="design/satellite-installation-seq.png" width=1200 height=392 alt="Satellite installation sequence diagram"/>
 
 ### Mission Flow
-<img src="design/satellite-mission-flow-seq.png" width=1091 height=314 alt="Mission flow sequence diagram"/>
+<img src="design/satellite-mission-flow-seq.png" width=932 height=377 alt="Mission flow sequence diagram"/>
 
 ### Mission CRUD
 <img src="design/satellite-mission-crud-seq.png" width=787 height=262 alt="Mission CRUD sequence diagram"/>
