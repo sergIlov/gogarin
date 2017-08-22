@@ -32,7 +32,7 @@ You can maximize throughput by running multiple instances of the same satellite 
  ````
 
 # Message brokers
-Planned support for NSQ, Kafka, Redis, RabbitMQ, SQS
+Support is planned for NSQ, Kafka, Redis, RabbitMQ, and SQS
 
 # Example satellites
  - **Triggers**
