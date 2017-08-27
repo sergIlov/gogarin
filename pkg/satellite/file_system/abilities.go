@@ -1,4 +1,4 @@
-package filesystem
+package file_system
 
 import (
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
