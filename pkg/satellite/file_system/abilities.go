@@ -5,8 +5,6 @@ import (
 	_ "github.com/fsnotify/fsnotify"
 )
 
-//import "github.com/fsnotify/fsnotify"
-
 type FileCreated struct {
 	satellite.Trigger
 }
@@ -15,6 +13,7 @@ func (fc *FileCreated) Info() satellite.AbilityInfo {
 	return satellite.AbilityInfo{
 		Name:        "File Created",
 		Description: "Triggers when a new file is created.",
+		Push:        true,
 	}
 }
 

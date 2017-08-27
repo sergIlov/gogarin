@@ -1,5 +1,7 @@
 package satellite
 
+import "fmt"
+
 type Interface interface {
 	Info() Info
 	Triggers() []Trigger
@@ -58,6 +60,8 @@ type Ability interface {
 
 type AbilityInfo struct {
 	Name        string
+	Pull        bool
+	Push        bool
 	Description string
 }
 
@@ -104,4 +108,45 @@ type Modifier interface {
 	Ability
 	// Modify returns the list of modified messages.
 	Modify([]*Message) ([]*Message, error)
+}
+
+func Register(s Interface) error {
+	fmt.Printf("Satellite:\n%+v\n", s.Info())
+
+	if len(s.Triggers()) > 0 {
+		fmt.Println("\nTriggers:")
+	}
+	for _, t := range s.Triggers() {
+		fmt.Printf("%+v\n", t.Info())
+	}
+
+	if len(s.Filters()) > 0 {
+		fmt.Println("\nFilters:")
+	}
+	for _, f := range s.Filters() {
+		fmt.Printf("%+v\n", f.Info())
+	}
+
+	if len(s.Modifiers()) > 0 {
+		fmt.Println("\nModifiers:")
+	}
+	for _, m := range s.Modifiers() {
+		fmt.Printf("%+v\n", m.Info())
+	}
+
+	if len(s.Splitters()) > 0 {
+		fmt.Println("\nSplitters:")
+	}
+	for _, s := range s.Splitters() {
+		fmt.Printf("%+v\n", s.Info())
+	}
+
+	if len(s.Actions()) > 0 {
+		fmt.Println("\nActions:")
+	}
+	for _, a := range s.Actions() {
+		fmt.Printf("%+v\n", a.Info())
+	}
+
+	return nil
 }
