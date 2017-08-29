@@ -1,30 +1,23 @@
 package satellite
 
-import "fmt"
-
-type SpaceCenter struct {
-}
-
-func (sc *SpaceCenter) Register(s *Satellite) {
-	fmt.Printf("Satellite:\n%+v\n", s.info)
-
-	if len(s.triggers) > 0 {
-		fmt.Println("\nTriggers:")
-	}
-	for i := range s.triggers {
-		fmt.Printf("%+v\n", i)
+func New(i Info) *Satellite {
+	return &Satellite{
+		Info:     i,
+		Triggers: make(map[AbilityInfo]Trigger),
 	}
 }
-
-type SpaceCenterConfig struct{}
 
 type Satellite struct {
-	info     Info
-	triggers map[AbilityInfo]Trigger
+	Info     Info
+	Triggers map[AbilityInfo]Trigger
 }
 
-func (s *Satellite) Start(sc *SpaceCenter) {
-	sc.Register(s)
+func (s *Satellite) AddTrigger(t Trigger, i AbilityInfo) {
+	s.Triggers[i] = t
+}
+
+func (s *Satellite) Start(c Connector) {
+	c.Register(s)
 }
 
 func (s *Satellite) Stop() {
@@ -32,23 +25,8 @@ func (s *Satellite) Stop() {
 
 type Trigger func()
 
-func (t Trigger) Validate() {
-
-}
-
-func (s *Satellite) AddTrigger(t Trigger, i AbilityInfo) {
-	s.triggers[i] = t
-}
-
-func NewSpaceCenter(c SpaceCenterConfig) *SpaceCenter {
-	return &SpaceCenter{}
-}
-
-func New(i Info) *Satellite {
-	return &Satellite{
-		info:     i,
-		triggers: make(map[AbilityInfo]Trigger),
-	}
+type Connector interface {
+	Register(*Satellite) error
 }
 
 type Info struct {

@@ -1,15 +1,32 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
 )
+
+type RabbitMQConnector struct {
+}
+
+func (c *RabbitMQConnector) Register(s *satellite.Satellite) error {
+	fmt.Printf("Satellite:\n%+v\n", s.Info)
+
+	if len(s.Triggers) > 0 {
+		fmt.Println("\nTriggers:")
+	}
+	for i := range s.Triggers {
+		fmt.Printf("%+v\n", i)
+	}
+
+	return nil
+}
 
 func FileCreated() {}
 func FileUpdated() {}
 func FileDeleted() {}
 
 func main() {
-	spaceCenter := satellite.NewSpaceCenter(satellite.SpaceCenterConfig{})
 	sat := satellite.New(
 		satellite.Info{
 			Name:        "File System Events",
@@ -39,6 +56,8 @@ func main() {
 			Description: "Triggers when a file or directory is deleted.",
 		},
 	)
-	sat.Start(spaceCenter)
+
+	connector := &RabbitMQConnector{}
+	sat.Start(connector)
 	sat.Stop()
 }
