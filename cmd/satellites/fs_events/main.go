@@ -6,10 +6,10 @@ import (
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
 )
 
-type RabbitMQConnector struct {
+type RedisConnector struct {
 }
 
-func (c *RabbitMQConnector) Register(s *satellite.Satellite) error {
+func (c *RedisConnector) Register(s *satellite.Satellite) error {
 	fmt.Printf("Satellite:\n%+v\n", s.Info)
 
 	if len(s.Triggers) > 0 {
@@ -52,6 +52,6 @@ func main() {
 		},
 	)
 
-	sat.Start(&RabbitMQConnector{})
+	sat.Start(&RedisConnector{})
 	sat.Stop()
 }

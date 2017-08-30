@@ -15,14 +15,14 @@ func (s *Satellite) AddTrigger(t Trigger) {
 	s.Triggers = append(s.Triggers, t)
 }
 
-func (s *Satellite) Start(c Connector) {
+func (s *Satellite) Start(c SpaceCenterConnector) {
 	c.Register(s)
 }
 
 func (s *Satellite) Stop() {
 }
 
-type Connector interface {
+type SpaceCenterConnector interface {
 	Register(*Satellite) error
 }
 
