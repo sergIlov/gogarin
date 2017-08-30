@@ -15,16 +15,19 @@ func (c *RabbitMQConnector) Register(s *satellite.Satellite) error {
 	if len(s.Triggers) > 0 {
 		fmt.Println("\nTriggers:")
 	}
-	for i := range s.Triggers {
-		fmt.Printf("%+v\n", i)
+	for _, t := range s.Triggers {
+		fmt.Printf("%+v\n", t.Info)
 	}
 
 	return nil
 }
 
 func FileCreated() {}
-func FileUpdated() {}
-func FileDeleted() {}
+
+type FileCreatedConfig struct {
+	Path      []string `json:"path" desc:"Path to the file or directory."`
+	Recursive bool     `json:"recursive" desc:"Triggers when a new file is created n-tiers down the directory tree."`
+}
 
 func main() {
 	sat := satellite.New(
@@ -36,28 +39,19 @@ func main() {
 	)
 
 	sat.AddTrigger(
-		FileCreated,
-		satellite.AbilityInfo{
-			Name:        "File Created",
-			Description: "Triggers when a new file or directory is created.",
-		},
-	)
-	sat.AddTrigger(
-		FileUpdated,
-		satellite.AbilityInfo{
-			Name:        "File Updated",
-			Description: "Triggers when a file or directory is changed.",
-		},
-	)
-	sat.AddTrigger(
-		FileDeleted,
-		satellite.AbilityInfo{
-			Name:        "File Deleted",
-			Description: "Triggers when a file or directory is deleted.",
+		satellite.Trigger{
+			Call: FileCreated,
+			Info: satellite.AbilityInfo{
+				Name:        "File Created",
+				Description: "Triggers when a new file or directory is created.",
+			},
+			Config: FileCreatedConfig{},
+			Validator: func(config interface{}) {
+
+			},
 		},
 	)
 
-	connector := &RabbitMQConnector{}
-	sat.Start(connector)
+	sat.Start(&RabbitMQConnector{})
 	sat.Stop()
 }
