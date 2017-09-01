@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
+	"github.com/kelseyhightower/envconfig"
 )
 
 type RedisConnector struct {
@@ -30,6 +32,17 @@ type FileCreatedConfig struct {
 }
 
 func main() {
+	var c satellite.Config
+	err := envconfig.Process("satellite", &c)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = satellite.NewRPC(c.RPC)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	sat := satellite.New(
 		satellite.Info{
 			Name:        "File System Events",

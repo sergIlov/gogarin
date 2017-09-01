@@ -1,5 +1,9 @@
 package satellite
 
+type Config struct {
+	RPC RPCConfig
+}
+
 func New(i Info) *Satellite {
 	return &Satellite{
 		Info: i,
@@ -33,11 +37,10 @@ type Info struct {
 }
 
 type Trigger struct {
-	Call   func()
-	Info   AbilityInfo
-	Config interface{}
+	Call      func()
+	Info      AbilityInfo
+	Config    interface{}
 	Validator func(config interface{})
-
 }
 
 type AbilityInfo struct {

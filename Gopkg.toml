@@ -1,13 +1,17 @@
-
 # Gopkg.toml example
 #
 # Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
 # for detailed Gopkg.toml documentation.
 #
-# required = ["github.com/user/thing/cmd/thing"]
-# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
-#
- [[constraint]]
-   name = "github.com/fsnotify/fsnotify"
-   version = "1.4.2"
+[[constraint]]
+  name = "github.com/fsnotify/fsnotify"
+  version = "1.4.2"
+
+[[constraint]]
+  name = "github.com/garyburd/redigo"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/oklog/ulid"
+  version = "0.3.0"
 
