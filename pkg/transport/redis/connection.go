@@ -6,12 +6,12 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/antonkuzmenko/gogarin/pkg/rpc"
+	"github.com/antonkuzmenko/gogarin/pkg/transport"
 	"github.com/garyburd/redigo/redis"
 	"github.com/oklog/ulid"
 )
 
-func New(c Config) rpc.Client {
+func New(c Config) transport.Connection {
 	pool := &redis.Pool{
 		MaxActive:   c.MaxActiveConnections,
 		MaxIdle:     c.MaxIdleConnections,
@@ -21,7 +21,7 @@ func New(c Config) rpc.Client {
 		},
 	}
 
-	return &client{pool: pool}
+	return &connection{pool: pool}
 }
 
 type Config struct {
@@ -51,11 +51,11 @@ type message struct {
 	Data    interface{} `json:"data"`
 }
 
-type client struct {
+type connection struct {
 	pool *redis.Pool
 }
 
-func (r *client) Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error) {
+func (r *connection) Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error) {
 	con := r.pool.Get()
 	defer con.Close()
 
@@ -77,13 +77,13 @@ func (r *client) Send(topic string, data interface{}, timeout time.Duration) (re
 	return result, err
 }
 
-func (r *client) Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
+func (r *connection) Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
 	con := r.pool.Get()
 	defer con.Close()
 	return receive(con, topic, timeout)
 }
 
-func (r *client) Respond(topic string, data interface{}) error {
+func (r *connection) Respond(topic string, data interface{}) error {
 	con := r.pool.Get()
 	defer con.Close()
 	return send(con, topic, "", data)
@@ -115,7 +115,7 @@ func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo strin
 
 	res, err := con.Do(command, topic, int(timeout.Seconds()))
 	if err == redis.ErrNil {
-		return "", nil, rpc.ErrTimeout
+		return "", nil, transport.ErrTimeout
 	}
 	if err != nil {
 		return "", nil, err
@@ -127,7 +127,7 @@ func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo strin
 	}
 
 	if len(bts) != 2 {
-		return "", nil, rpc.ErrInvalidResponse
+		return "", nil, transport.ErrInvalidResponse
 	}
 
 	var msg message

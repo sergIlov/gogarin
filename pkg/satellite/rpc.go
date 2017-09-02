@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/antonkuzmenko/gogarin/pkg/rpc"
-	"github.com/antonkuzmenko/gogarin/pkg/rpc/redis"
+	"github.com/antonkuzmenko/gogarin/pkg/transport"
+	"github.com/antonkuzmenko/gogarin/pkg/transport/redis"
 )
 
 type RPCConfig struct {
@@ -17,7 +17,7 @@ const (
 	redisRPC = "redis"
 )
 
-func NewRPC(c RPCConfig) (rpc.Client, error) {
+func NewRPC(c RPCConfig) (transport.Connection, error) {
 	if c.Adapter == redisRPC {
 		return redis.New(c.Redis), nil
 	}
