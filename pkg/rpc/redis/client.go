@@ -1,11 +1,8 @@
 package redis
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"math/rand"
 	"time"
 
@@ -24,7 +21,7 @@ func New(c Config) rpc.Client {
 		},
 	}
 
-	return &redisClient{pool: pool}
+	return &client{pool: pool}
 }
 
 type Config struct {
@@ -51,29 +48,28 @@ type Config struct {
 
 type message struct {
 	ReplyTo string `json:"reply_to"`
-	Data    []byte `json:"data"`
+	Data    interface{} `json:"data"`
 }
 
-type redisClient struct {
+type client struct {
 	pool *redis.Pool
 }
 
-func (r *redisClient) Send(topic string, data io.Reader, timeout time.Duration) (result io.Reader, err error) {
+func (r *client) Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error) {
 	con := r.pool.Get()
 	defer con.Close()
-	emptyReader := bytes.NewReader(nil)
 
 	t := time.Now()
 	entropy := rand.New(rand.NewSource(t.UnixNano()))
 	id, err := ulid.New(ulid.Timestamp(t), entropy)
 	if err != nil {
-		return emptyReader, err
+		return nil, err
 	}
 	replyTo := topic + ":reply:" + fmt.Sprintf("%s", id)
 
 	err = send(con, topic, replyTo, data)
 	if err != nil {
-		return emptyReader, err
+		return nil, err
 	}
 
 	_, result, err = receive(con, replyTo, timeout)
@@ -81,31 +77,26 @@ func (r *redisClient) Send(topic string, data io.Reader, timeout time.Duration) 
 	return result, err
 }
 
-func (r *redisClient) Respond(replyTo string, data io.Reader) error {
-	con := r.pool.Get()
-	defer con.Close()
-	return send(con, replyTo, "", data)
-}
-
-func (r *redisClient) Receive(topic string, timeout time.Duration) (replyTo string, data io.Reader, err error) {
+func (r *client) Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
 	con := r.pool.Get()
 	defer con.Close()
 	return receive(con, topic, timeout)
 }
 
-func send(con redis.Conn, topic, replyTo string, data io.Reader) error {
+func (r *client) Respond(topic string, data interface{}) error {
+	con := r.pool.Get()
+	defer con.Close()
+	return send(con, topic, "", data)
+}
+
+func send(con redis.Conn, topic, replyTo string, data interface{}) error {
 	const command = "LPUSH"
 
 	if con.Err() != nil {
 		return con.Err()
 	}
 
-	d, err := ioutil.ReadAll(data)
-	if err != nil {
-		return err
-	}
-
-	m := message{ReplyTo: replyTo, Data: d}
+	m := message{ReplyTo: replyTo, Data: data}
 	mbyte, err := json.Marshal(m)
 	if err != nil {
 		return err
@@ -115,36 +106,35 @@ func send(con redis.Conn, topic, replyTo string, data io.Reader) error {
 	return err
 }
 
-func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo string, data io.Reader, err error) {
+func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
 	const command = "BRPOP"
-	emptyReader := bytes.NewReader(nil)
 
 	if con.Err() != nil {
-		return "", emptyReader, con.Err()
+		return "", nil, con.Err()
 	}
 
 	res, err := con.Do(command, topic, int(timeout.Seconds()))
 	if err == redis.ErrNil {
-		return "", emptyReader, rpc.ErrTimeout
+		return "", nil, rpc.ErrTimeout
 	}
 	if err != nil {
-		return "", emptyReader, err
+		return "", nil, err
 	}
 	bts, err := redis.ByteSlices(res, err)
 
 	if err != nil {
-		return "", emptyReader, err
+		return "", nil, err
 	}
 
 	if len(bts) != 2 {
-		return "", emptyReader, rpc.ErrInvalidResponse
+		return "", nil, rpc.ErrInvalidResponse
 	}
 
 	var msg message
 	err = json.Unmarshal(bts[1], &msg)
 	if err != nil {
-		return "", emptyReader, err
+		return "", nil, err
 	}
 
-	return msg.ReplyTo, bytes.NewReader(msg.Data), err
+	return msg.ReplyTo, msg.Data, err
 }
