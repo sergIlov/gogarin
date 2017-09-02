@@ -8,6 +8,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/go-kit/kit"
+  packages = ["endpoint"]
+  revision = "a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b"
+  version = "v0.5.0"
+
+[[projects]]
   name = "github.com/kelseyhightower/envconfig"
   packages = ["."]
   revision = "f611eb38b3875cc3bd991ca91c51d06446afa14c"
@@ -22,6 +28,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bec689accec517cfffe6480cafacd170257b33a300fb41b528a15c97501b60ab"
+  inputs-digest = "d9bf4f2c1cbb498ea1a70ee4f9d459665d9a3c921d4c98e925fa394e09cfba1c"
   solver-name = "gps-cdcl"
   solver-version = 1
