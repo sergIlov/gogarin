@@ -123,7 +123,6 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler) {
 
 			// TODO: Add timeout for ServeRPC
 			res := h.ServeRPC(ctx, data)
-			// TODO: Add timeout for Respond
 			err = s.conn.Respond(replyTo, res)
 			if err != nil {
 				s.l.Log("err", err)
