@@ -2,10 +2,9 @@ package transport
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
-
-	"errors"
 
 	"github.com/go-kit/kit/log"
 )
@@ -86,8 +85,8 @@ func (s *Server) Serve() error {
 }
 
 func (s *Server) serve(ctx context.Context) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	for _, entry := range s.m {
 		go s.handle(ctx, entry.topic, entry.h)
