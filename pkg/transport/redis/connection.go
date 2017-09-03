@@ -114,14 +114,14 @@ func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo strin
 	}
 
 	res, err := con.Do(command, topic, int(timeout.Seconds()))
-	if err == redis.ErrNil {
-		return "", nil, transport.ErrTimeout
-	}
 	if err != nil {
 		return "", nil, err
 	}
 	bts, err := redis.ByteSlices(res, err)
 
+	if err == redis.ErrNil {
+		return "", nil, transport.ErrTimeout
+	}
 	if err != nil {
 		return "", nil, err
 	}
