@@ -49,13 +49,12 @@ type Server struct {
 
 	mu sync.RWMutex
 	m  map[string]entry
-
-	workers sync.WaitGroup
 }
 
 type entry struct {
 	h     Handler
 	topic string
+	done  chan struct{}
 }
 
 // ErrServerClosed is returned by the Server's Serve method after a call to Shutdown.
@@ -78,7 +77,7 @@ func (s *Server) Handle(topic string, handler Handler) {
 		panic("server: multiple registrations for " + topic)
 	}
 
-	s.m[topic] = entry{h: handler, topic: topic}
+	s.m[topic] = entry{h: handler, topic: topic, done: make(chan struct{})}
 }
 
 // Serve responds to incoming requests, creating a new service goroutine for each topic.
@@ -103,15 +102,20 @@ func (s *Server) serve(ctx context.Context) {
 	defer s.mu.RUnlock()
 
 	for _, entry := range s.m {
-		go s.handle(ctx, entry.topic, entry.h)
+		level.Info(s.l).Log("serve", entry.topic)
+		go s.handle(ctx, entry.topic, entry.h, entry.done)
 	}
 }
 
-func (s *Server) handle(ctx context.Context, topic string, h Handler) {
+func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<- struct{}) {
+	var requests sync.WaitGroup
+
 	for {
 		select {
 		case <-ctx.Done():
+			requests.Wait()
 			level.Info(s.l).Log("done", topic)
+			done <- struct{}{}
 			return
 		default:
 		}
@@ -125,9 +129,9 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler) {
 			continue
 		}
 
-		s.workers.Add(1)
+		requests.Add(1)
 		go func() {
-			defer s.workers.Done()
+			defer requests.Done()
 			defer func() {
 				if err := recover(); err != nil {
 					level.Error(s.l).Log("err", err, "serving", topic)
@@ -162,16 +166,14 @@ func (s *Server) Shutdown(ctx context.Context) error {
 		close(s.done)
 	}
 
-	handlersDone := make(chan struct{})
-	go func() {
-		s.workers.Wait()
-		handlersDone <- struct{}{}
-	}()
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-handlersDone:
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for _, entry := range s.m {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-entry.done:
+		}
 	}
 
 	return nil
