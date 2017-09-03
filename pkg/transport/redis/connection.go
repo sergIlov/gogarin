@@ -47,7 +47,7 @@ type Config struct {
 }
 
 type message struct {
-	ReplyTo string `json:"reply_to"`
+	ReplyTo string      `json:"reply_to"`
 	Data    interface{} `json:"data"`
 }
 
