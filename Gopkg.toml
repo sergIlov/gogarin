@@ -15,3 +15,7 @@
   name = "github.com/oklog/ulid"
   version = "0.3.0"
 
+[[constraint]]
+  name = "github.com/kelseyhightower/envconfig"
+  version = "1.1"
+
