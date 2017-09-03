@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 // A Handler responds to an RPC request.
@@ -110,7 +111,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler) {
 	for {
 		select {
 		case <-ctx.Done():
-			s.l.Log("done", topic)
+			level.Info(s.l).Log("done", topic)
 			return
 		default:
 		}
@@ -120,7 +121,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler) {
 			continue
 		}
 		if err != nil {
-			s.l.Log("err", err)
+			level.Error(s.l).Log("err", err)
 			continue
 		}
 
@@ -129,7 +130,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler) {
 			defer s.workers.Done()
 			defer func() {
 				if err := recover(); err != nil {
-					s.l.Log("err", err, "serving", topic)
+					level.Error(s.l).Log("err", err, "serving", topic)
 				}
 			}()
 
@@ -137,7 +138,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler) {
 			res := h.ServeRPC(ctx, data)
 			err = s.conn.Respond(replyTo, res)
 			if err != nil {
-				s.l.Log("err", err)
+				level.Error(s.l).Log("err", err)
 			}
 		}()
 	}

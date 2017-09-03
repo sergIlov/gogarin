@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 // Server wraps an endpoint and implements a Handler.
@@ -60,19 +61,19 @@ func ServerLogger(logger log.Logger) ServerOption {
 func (s Server) ServeRPC(ctx context.Context, req interface{}) interface{} {
 	request, err := s.dec(ctx, req)
 	if err != nil {
-		s.logger.Log("err", err)
+		level.Error(s.logger).Log("err", err)
 		return s.errorEncoder(ctx, err)
 	}
 
 	response, err := s.e(ctx, request)
 	if err != nil {
-		s.logger.Log("err", err)
+		level.Error(s.logger).Log("err", err)
 		return s.errorEncoder(ctx, err)
 	}
 
 	res, err := s.enc(ctx, response)
 	if err != nil {
-		s.logger.Log("err", err)
+		level.Error(s.logger).Log("err", err)
 		return s.errorEncoder(ctx, err)
 	}
 
