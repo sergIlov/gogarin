@@ -19,16 +19,29 @@ type Handler interface {
 }
 
 // NewServer constructs new RPC server.
-func NewServer(conn Connection, l log.Logger) *Server {
-	return &Server{conn: conn, l: l, done: make(chan struct{}), m: make(map[string]entry)}
+func NewServer(conn Connection, pullTimeout time.Duration, l log.Logger) *Server {
+	return &Server{
+		conn:        conn,
+		pollTimeout: pullTimeout,
+		l:           l,
+		done:        make(chan struct{}),
+		m:           make(map[string]entry),
+	}
 }
 
 // Server is a RPC server.
 // It matches the topic of each incoming request against a list of registered
 // topics and calls the corresponding handler.
+//
+// Server uses log polling for getting new request from a message broker.
+// pollTimeout sets the limit for waiting for new messages.
+// Be careful with this setting, setting it to a high value would block the Shutdown.
+// The rule of thumb is to keep pollTimeout small enough for a faster Shutdown
+// and large enough to not flood your message broker with a large number of requests.
 type Server struct {
-	conn Connection
-	l    log.Logger
+	conn        Connection
+	pollTimeout time.Duration
+	l           log.Logger
 
 	doneMu sync.Mutex
 	done   chan struct{}
@@ -102,8 +115,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler) {
 		default:
 		}
 
-		// TODO: Hide timeout in the connection config
-		replyTo, data, err := s.conn.Receive(topic, time.Duration(2)*time.Second)
+		replyTo, data, err := s.conn.Receive(topic, s.pollTimeout)
 		if err == ErrTimeout {
 			continue
 		}
