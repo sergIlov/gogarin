@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -153,5 +154,10 @@ func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo strin
 		return "", nil, err
 	}
 
-	return msg.ReplyTo, msg.Data, err
+	data, err = base64.StdEncoding.DecodeString(msg.Data.(string))
+	if err != nil {
+		return "", nil, err
+	}
+
+	return msg.ReplyTo, data, err
 }
