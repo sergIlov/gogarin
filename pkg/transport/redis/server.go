@@ -61,19 +61,19 @@ func ServerLogger(logger log.Logger) ServerOption {
 func (s Server) ServeRPC(ctx context.Context, req interface{}) interface{} {
 	request, err := s.dec(ctx, req)
 	if err != nil {
-		level.Error(s.logger).Log("err", err)
+		level.Error(s.logger).Log("err", err, "context", "dec")
 		return s.errorEncoder(ctx, err)
 	}
 
 	response, err := s.e(ctx, request)
 	if err != nil {
-		level.Error(s.logger).Log("err", err)
+		level.Error(s.logger).Log("err", err, "context", "endpoint")
 		return s.errorEncoder(ctx, err)
 	}
 
 	res, err := s.enc(ctx, response)
 	if err != nil {
-		level.Error(s.logger).Log("err", err)
+		level.Error(s.logger).Log("err", err, "context", "enc")
 		return s.errorEncoder(ctx, err)
 	}
 
@@ -94,7 +94,7 @@ func DefaultErrorEncoder(_ context.Context, err error) interface{} {
 	err = json.NewEncoder(&buf).Encode(response{Ok: false, Errors: []error{err}})
 	if err != nil {
 		buf = bytes.Buffer{}
-		res := response{Ok: false, Errors: []error{errors.New("Could not encode an error")}}
+		res := response{Ok: false, Errors: []error{errors.New("could not encode an error")}}
 		_ = json.NewEncoder(&buf).Encode(res)
 	}
 
