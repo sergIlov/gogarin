@@ -1,28 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
+	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )
-
-type RedisConnector struct {
-}
-
-func (c *RedisConnector) Register(s *satellite.Satellite) error {
-	fmt.Printf("Satellite:\n%+v\n", s.Info)
-
-	if len(s.Triggers) > 0 {
-		fmt.Println("\nTriggers:")
-	}
-	for _, t := range s.Triggers {
-		fmt.Printf("%+v\n", t.Info)
-	}
-
-	return nil
-}
 
 func FileCreated() {}
 
@@ -32,18 +16,20 @@ type FileCreatedConfig struct {
 }
 
 func main() {
+	godotenv.Load(".env")
 	var c satellite.Config
-	err := envconfig.Process("satellite", &c)
+	err := envconfig.Process("gogarin_satellite", &c)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = satellite.NewRPC(c.RPC)
+	rpc, err := satellite.NewRPC(c.RPC)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	sat := satellite.New(
+		rpc,
 		satellite.Info{
 			Name:        "File System Events",
 			Version:     "0.1.0-alpha",
@@ -65,6 +51,6 @@ func main() {
 		},
 	)
 
-	sat.Start(&RedisConnector{})
+	sat.Start()
 	sat.Stop()
 }

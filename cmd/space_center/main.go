@@ -45,12 +45,12 @@ func main() {
 		if err != nil {
 			return nil, err
 		}
-		return buf, nil
+		return buf.Bytes(), nil
 	}
 
 	registerEndpoint := func(ctx context.Context, req interface{}) (res interface{}, err error) {
 		i := req.(satellite.Info)
-		level.Info(logger).Log("info", i)
+		level.Info(logger).Log("name", i.Name, "version", i.Version)
 		return i, nil
 	}
 
@@ -61,10 +61,14 @@ func main() {
 		if err != nil {
 			return nil, err
 		}
+
 		return i, nil
 	}
 
-	register := redis.NewServer(registerEndpoint, registerDec, enc)
+	register := redis.NewServer(
+		registerEndpoint, registerDec, enc,
+		redis.ServerLogger(log.With(logger, "component", "redis.Server")),
+	)
 	server := transport.NewServer(
 		conn,
 		time.Duration(config.RPC.PollTimeoutInMs)*time.Millisecond,
