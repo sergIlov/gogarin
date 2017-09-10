@@ -7,6 +7,7 @@ import (
 
 // ErrInvalidResponse indicates corrupted response from a message broker.
 var ErrInvalidResponse = errors.New("invalid response")
+
 // ErrTimeout is returned when Send or Receive timeouts.
 var ErrTimeout = errors.New("timeout is reached")
 

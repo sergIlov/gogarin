@@ -19,6 +19,7 @@ lint: prepare_metalinter
 		--enable=lll --line-length=120 \
 		--enable=misspell \
 		--enable=unparam \
+		--exclude="error return value not checked .*\.Log\(" \
 		--tests \
 		$(shell test -n "${ERRORS_ONLY}" && echo --errors) \
 		--vendor ./...
