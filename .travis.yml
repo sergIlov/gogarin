@@ -6,7 +6,7 @@ go:
   - 1.8
 matrix:
   allow_failures:
-    - go: master
+    - go: tip
 install:
   - make vendor
   - make prepare_metalinter
