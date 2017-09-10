@@ -76,7 +76,7 @@ type connection struct {
 
 func (r *connection) Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error) {
 	con := r.pool.Get()
-	defer con.Close()
+	defer con.Close() // nolint: errcheck
 
 	t := time.Now()
 	entropy := rand.New(rand.NewSource(t.UnixNano()))
@@ -98,13 +98,13 @@ func (r *connection) Send(topic string, data interface{}, timeout time.Duration)
 
 func (r *connection) Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
 	con := r.pool.Get()
-	defer con.Close()
+	defer con.Close() // nolint: errcheck
 	return receive(con, topic, timeout)
 }
 
 func (r *connection) Respond(topic string, data interface{}) error {
 	con := r.pool.Get()
-	defer con.Close()
+	defer con.Close() // nolint: errcheck
 	return send(con, topic, "", data)
 }
 
