@@ -9,7 +9,15 @@ BUILD_TIME?=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
 
 .PHONY: lint
 lint: prepare_metalinter
-	gometalinter --enable=lll --line-length=120 --vendor ./...
+	gometalinter \
+		--enable=megacheck \
+		--enable=gofmt \
+		--enable=goimports \
+		--enable=lll --line-length=120 \
+		--enable=misspell \
+		--enable=unparam \
+		--tests \
+		--vendor ./...
 
 .PHONY: build
 build: clean
