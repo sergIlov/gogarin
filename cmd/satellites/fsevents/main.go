@@ -69,17 +69,17 @@ func FileCreatedFields() satellite.AbilityFields {
 	return satellite.AbilityFields{
 		"file": &satellite.AbilityField{
 			Name:        "File",
-			Type:        satellite.OBJECT,
+			Type:        satellite.Object,
 			Description: "Created file or directory",
 			Fields: satellite.AbilityFields{
 				"name": &satellite.AbilityField{
 					Name:        "File.Name",
-					Type:        satellite.STRING,
+					Type:        satellite.String,
 					Description: "Name of created file or directory",
 				},
 				"type": &satellite.AbilityField{
 					Name:        "File.Type",
-					Type:        satellite.STRING,
+					Type:        satellite.String,
 					Description: "Name of created object (file or directory)",
 				},
 			},

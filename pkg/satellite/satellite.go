@@ -69,16 +69,31 @@ type AbilityInfo struct {
 	Description string
 }
 
-const (
-	STRING = "string"
-	OBJECT = "object"
+type AbilityFieldType struct {
+	Name        string
+	Description string
+}
+
+func NewAbilityFieldType(name string, description string) AbilityFieldType {
+	return AbilityFieldType{name, description}
+}
+
+var (
+	Boolean    = NewAbilityFieldType("boolean", "")
+	Integer    = NewAbilityFieldType("integer", "")
+	Float      = NewAbilityFieldType("Float", "")
+	String     = NewAbilityFieldType("string", "")
+	Date       = NewAbilityFieldType("date", "")
+	Datetime   = NewAbilityFieldType("datetime", "")
+	Object     = NewAbilityFieldType("object", "")
+	Collection = NewAbilityFieldType("collection", "")
 )
 
 type AbilityFields map[string]*AbilityField
 
 type AbilityField struct {
 	Name        string
-	Type        string
+	Type        AbilityFieldType
 	Description string
 	Fields      AbilityFields
 }
