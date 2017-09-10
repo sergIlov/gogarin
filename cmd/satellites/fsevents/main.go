@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"fmt"
+	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
 )
 
 func FileCreated() {}
@@ -65,21 +66,21 @@ func main() {
 	sat.Stop()
 }
 
-func FileCreatedFields() satellite.AbilityFields {
-	return satellite.AbilityFields{
-		"file": &satellite.AbilityField{
+func FileCreatedFields() schema.Fields {
+	return schema.Fields{
+		"file": &schema.Field{
 			Name:        "File",
-			Type:        satellite.Object,
+			Type:        schema.Object,
 			Description: "Created file or directory",
-			Fields: satellite.AbilityFields{
-				"name": &satellite.AbilityField{
+			Fields: schema.Fields{
+				"name": &schema.Field{
 					Name:        "File.Name",
-					Type:        satellite.String,
+					Type:        schema.String,
 					Description: "Name of created file or directory",
 				},
-				"type": &satellite.AbilityField{
+				"type": &schema.Field{
 					Name:        "File.Type",
-					Type:        satellite.String,
+					Type:        schema.String,
 					Description: "Name of created object (file or directory)",
 				},
 			},
