@@ -1,7 +1,6 @@
 package satellite
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/antonkuzmenko/gogarin/pkg/transport"
@@ -22,5 +21,5 @@ func NewRPC(c RPCConfig) (transport.Connection, error) {
 		return redis.New(c.Redis), nil
 	}
 
-	return nil, errors.New(fmt.Sprintf("RPC client for %q is not found", c.Adapter))
+	return nil, fmt.Errorf("RPC client for %q is not found", c.Adapter)
 }

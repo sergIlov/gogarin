@@ -16,9 +16,13 @@ type FileCreatedConfig struct {
 }
 
 func main() {
-	godotenv.Load(".env")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+
 	var c satellite.Config
-	err := envconfig.Process("gogarin_satellite", &c)
+	err = envconfig.Process("gogarin_satellite", &c)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,6 +55,9 @@ func main() {
 		},
 	)
 
-	sat.Start()
+	err = sat.Start()
+	if err != nil {
+		panic(err)
+	}
 	sat.Stop()
 }

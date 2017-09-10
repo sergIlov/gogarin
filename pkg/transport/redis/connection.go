@@ -3,7 +3,6 @@ package redis
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -83,7 +82,7 @@ func (r *connection) Send(topic string, data interface{}, timeout time.Duration)
 	if err != nil {
 		return nil, err
 	}
-	replyTo := topic + ":reply:" + fmt.Sprintf("%s", id)
+	replyTo := topic + ":reply:" + id.String()
 
 	err = send(con, topic, replyTo, data)
 	if err != nil {

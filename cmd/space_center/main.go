@@ -36,9 +36,13 @@ type Config struct {
 }
 
 func main() {
-	godotenv.Load(".env")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+
 	var config Config
-	err := envconfig.Process("gogarin_space_center", &config)
+	err = envconfig.Process("gogarin_space_center", &config)
 	if err != nil {
 		panic(err)
 	}
@@ -132,6 +136,12 @@ func newLogger(c Config) log.Logger {
 		panic("invalid logger format: " + c.Logger)
 	}
 
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(
+		logger,
+		"ts", log.DefaultTimestampUTC,
+		"version", version,
+		"commit", commit,
+		"build_ts", buildTime,
+	)
 	return logger
 }
