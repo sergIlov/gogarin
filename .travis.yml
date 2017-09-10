@@ -1,12 +1,9 @@
 language: go
 sudo: false
 go:
-  - master
+  - tip
   - 1.x
   - 1.8
-  - 1.7
-  - 1.6
-  - tip
 matrix:
   allow_failures:
     - go: master
