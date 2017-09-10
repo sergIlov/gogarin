@@ -1,4 +1,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/antonkuzmenko/gogarin)](https://goreportcard.com/report/github.com/antonkuzmenko/gogarin)
+[![Build Status](https://travis-ci.org/antonkuzmenko/gogarin.svg?branch=master)](https://travis-ci.org/antonkuzmenko/gogarin)
 [![MIT license](https://img.shields.io/badge/license-MIT%202.0-blue.svg?style=flat-square)](https://github.com/antonkuzmenko/gogarin/blob/master/LICENSE)
 
 # Gogarin
