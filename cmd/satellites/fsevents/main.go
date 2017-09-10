@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
-
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"fmt"
 )
 
 func FileCreated() {}
@@ -41,6 +41,9 @@ func main() {
 		},
 	)
 
+	f := FileCreatedFields()
+	fmt.Print(f)
+	
 	sat.AddTrigger(
 		satellite.Trigger{
 			Call: FileCreated,
@@ -60,4 +63,26 @@ func main() {
 		panic(err)
 	}
 	sat.Stop()
+}
+
+func FileCreatedFields() satellite.AbilityFields {
+	return satellite.AbilityFields{
+		"file": &satellite.AbilityField{
+			Name:        "File",
+			Type:        satellite.OBJECT,
+			Description: "Created file or directory",
+			Fields: satellite.AbilityFields{
+				"name": &satellite.AbilityField{
+					Name:        "File.Name",
+					Type:        satellite.STRING,
+					Description: "Name of created file or directory",
+				},
+				"type": &satellite.AbilityField{
+					Name:        "File.Type",
+					Type:        satellite.STRING,
+					Description: "Name of created object (file or directory)",
+				},
+			},
+		},
+	}
 }

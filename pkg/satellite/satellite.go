@@ -68,3 +68,17 @@ type AbilityInfo struct {
 	Name        string
 	Description string
 }
+
+const (
+	STRING = "string"
+	OBJECT = "object"
+)
+
+type AbilityFields map[string]*AbilityField
+
+type AbilityField struct {
+	Name        string
+	Type        string
+	Description string
+	Fields      AbilityFields
+}
