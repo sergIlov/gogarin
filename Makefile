@@ -1,4 +1,5 @@
 APP?=gogarin
+SERVICE?=space_center
 RELEASE?=0.1.0
 GOOS?=linux
 GOARCH?=amd64
@@ -6,6 +7,8 @@ DISTDIR?=dist
 
 COMMIT?=$(shell git rev-parse --short HEAD)
 BUILD_TIME?=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
+
+ERRORS_ONLY?=""
 
 .PHONY: lint
 lint: prepare_metalinter
@@ -17,17 +20,19 @@ lint: prepare_metalinter
 		--enable=misspell \
 		--enable=unparam \
 		--tests \
+		$(shell test -n "${ERRORS_ONLY}" && echo --errors) \
 		--vendor ./...
 
 .PHONY: build
 build: clean
 	GOOS=${GOOS} GOARCH=${GOARCH} go build \
 		-ldflags "-X main.version=${RELEASE} -X main.commit=${COMMIT} -X main.buildTime=${BUILD_TIME}" \
-		-o ${DISTDIR}/${APP}/${APP}-$VERSION-$GOOS-$GOARCH
+		-o ${DISTDIR}/${APP}/${SERVICE}-${RELEASE}-${GOOS}-${GOARCH} \
+		"./cmd/${SERVICE}"
 
 .PHONY: clean
 clean:
-	@rm -f ${DISTDIR}/${APP}/${APP}-$VERSION-$GOOS-$GOARCH
+	@rm -f ${DISTDIR}/${APP}/${SERVICE}-${RELEASE}-${GOOS}-${GOARCH}
 
 .PHONY: vendor
 vendor: prepare_dep
