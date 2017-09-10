@@ -1,8 +1,15 @@
 language: go
 sudo: false
 go:
-  - 1.9
+  - master
+  - 1.x
+  - 1.8
+  - 1.7
+  - 1.6
   - tip
+matrix:
+  allow_failures:
+    - go: master
 install:
   - make vendor
   - make prepare_metalinter
