@@ -1,0 +1,11 @@
+language: go
+sudo: false
+go:
+  - 1.9
+  - tip
+install:
+  - make vendor
+  - make prepare_metalinter
+script:
+  - make build
+  - make lint ERRORS_ONLY=true
