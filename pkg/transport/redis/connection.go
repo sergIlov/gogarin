@@ -11,6 +11,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
+// New creates a connection pool that implements transport.Connection.
 func New(c Config) transport.Connection {
 	pool := &redis.Pool{
 		MaxActive:   c.MaxActiveConnections,
@@ -30,6 +31,7 @@ func New(c Config) transport.Connection {
 	return &connection{pool: pool}
 }
 
+// Config for redis.Pool.
 type Config struct {
 	// Address specifies the location of the redis sever and is used when dialing a connection.
 	Address string `default:"localhost:6379"`

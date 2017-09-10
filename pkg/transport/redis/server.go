@@ -58,6 +58,7 @@ func ServerLogger(logger log.Logger) ServerOption {
 	return func(s *Server) { s.logger = logger }
 }
 
+// ServeRPC implements transport.Handler.
 func (s Server) ServeRPC(ctx context.Context, req interface{}) interface{} {
 	request, err := s.dec(ctx, req)
 	if err != nil {
