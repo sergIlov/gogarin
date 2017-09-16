@@ -18,13 +18,6 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-// set by release script, see Makefile
-var (
-	version   = "dev"
-	commit    string
-	buildTime string
-)
-
 type Config struct {
 	RPC struct {
 		Adapter             string `required:"true"`
