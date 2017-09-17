@@ -4,3 +4,11 @@ services:
     image: redis:4-alpine
     ports:
       - 6379:6379
+  postgress:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - DB_USER=gogarin
+      - DB_PASS=gogarin
+      - DB_NAME=gogarin_space_center
