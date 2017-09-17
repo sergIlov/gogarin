@@ -158,16 +158,16 @@ const (
 )
 
 func openDBConnection(c Config, l log.Logger) *sql.DB {
-    if c.Database.Driver == postgressDBDriver {
-	    db, err := sql.Open(postgressDBDriver, c.Database.URL)
-	    
-	    if err != nil {
-	    	level.Error(l).Log("error", err, "driver", c.Database.Driver)
-	    	os.Exit(1)
-	    }
-	    return db
-    }
-    
+	if c.Database.Driver == postgressDBDriver {
+		db, err := sql.Open(postgressDBDriver, c.Database.URL)
+
+		if err != nil {
+			level.Error(l).Log("error", err, "driver", c.Database.Driver)
+			os.Exit(1)
+		}
+		return db
+	}
+
 	level.Error(l).Log("error", "Invalid Database.Driver", "driver", c.Database.Driver)
 	os.Exit(1)
 	return nil

@@ -73,7 +73,7 @@ type Action struct {
 	Call      func()
 	Info      AbilityInfo
 	Config    interface{}
-	validator func(config interface{})
+	Validator func(config interface{})
 }
 
 type AbilityInfo struct {

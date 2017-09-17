@@ -1,12 +1,12 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
+	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"fmt"
-	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
+	"log"
 )
 
 func FileCreated() {}
@@ -14,6 +14,10 @@ func FileCreated() {}
 type FileCreatedConfig struct {
 	Path      []string `json:"path" desc:"Path to the file or directory."`
 	Recursive bool     `json:"recursive" desc:"Triggers when a new file is created n-tiers down the directory tree."`
+}
+
+type AppendFileConfig struct {
+	Path string `json:"path" desc:"Path to the file"`
 }
 
 func main() {
@@ -44,7 +48,7 @@ func main() {
 
 	f := FileCreatedFields()
 	fmt.Print(f)
-	
+
 	sat.AddTrigger(
 		satellite.Trigger{
 			Call: FileCreated,
@@ -53,6 +57,20 @@ func main() {
 				Description: "Triggers when a new file or directory is created.",
 			},
 			Config: FileCreatedConfig{},
+			Validator: func(config interface{}) {
+
+			},
+		},
+	)
+
+	sat.AddAction(
+		satellite.Action{
+			Call: func() {},
+			Info: satellite.AbilityInfo{
+				Name:        "Append file",
+				Description: "Append the specified file",
+			},
+			Config: AppendFileConfig{},
 			Validator: func(config interface{}) {
 
 			},
