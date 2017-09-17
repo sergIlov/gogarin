@@ -23,10 +23,15 @@ type Satellite struct {
 	client   transport.Connection
 	Info     Info
 	Triggers []Trigger
+	Actions  []Action
 }
 
 func (s *Satellite) AddTrigger(t Trigger) {
 	s.Triggers = append(s.Triggers, t)
+}
+
+func (s *Satellite) AddAction(a Action) {
+	s.Actions = append(s.Actions, a)
 }
 
 func (s *Satellite) Start() error {
@@ -62,6 +67,13 @@ type Trigger struct {
 	Info      AbilityInfo
 	Config    interface{}
 	Validator func(config interface{})
+}
+
+type Action struct {
+	Call      func()
+	Info      AbilityInfo
+	Config    interface{}
+	validator func(config interface{})
 }
 
 type AbilityInfo struct {
