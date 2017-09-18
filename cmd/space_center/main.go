@@ -154,12 +154,12 @@ func newLogger(c Config) log.Logger {
 }
 
 const (
-	postgressDBDriver = "postgres"
+	postgresDBDriver = "postgres"
 )
 
 func openDBConnection(c Config, l log.Logger) *sql.DB {
-	if c.Database.Driver == postgressDBDriver {
-		db, err := sql.Open(postgressDBDriver, c.Database.URL)
+	if c.Database.Driver == postgresDBDriver {
+		db, err := sql.Open(postgresDBDriver, c.Database.URL)
 
 		if err != nil {
 			level.Error(l).Log("error", err, "driver", c.Database.Driver)

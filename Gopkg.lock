@@ -44,6 +44,12 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/lib/pq"
+  packages = [".","oid"]
+  revision = "23da1db4f16d9658a86ae9b717c245fc078f10f1"
+
+[[projects]]
   name = "github.com/oklog/ulid"
   packages = ["."]
   revision = "d311cb43c92434ec4072dfbbda3400741d0a6337"
@@ -52,6 +58,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4f252cfb7fa4a695726b8f332a6ca9bf101acd30718ebb5eb01fe82ce8e8937e"
+  inputs-digest = "2220a9939b9a529187acee2a380a2ee802db3af26c2fd87224bbb8a992e84fe2"
   solver-name = "gps-cdcl"
   solver-version = 1
