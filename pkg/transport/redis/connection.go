@@ -28,15 +28,15 @@ func New(c Config) transport.Connection {
 		},
 	}
 
-	return &connection{pool: pool}
+	return &Connection{pool: pool}
 }
 
 // Config for redis.Pool.
 type Config struct {
-	// Address specifies the location of the redis sever and is used when dialing a connection.
+	// Address specifies the location of the redis sever and is used when dialing a Connection.
 	Address string `default:"localhost:6379"`
 
-	// DB specifies the database to select when dialing a connection.
+	// DB specifies the database to select when dialing a Connection.
 	DB int `default:"0"`
 
 	// MaxIdleConnections is a maximum number of idle connections in the pool.
@@ -70,11 +70,11 @@ type message struct {
 	Data    interface{} `json:"data"`
 }
 
-type connection struct {
+type Connection struct {
 	pool *redis.Pool
 }
 
-func (r *connection) Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error) {
+func (r *Connection) Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error) {
 	con := r.pool.Get()
 	defer con.Close() // nolint: errcheck
 
@@ -96,13 +96,13 @@ func (r *connection) Send(topic string, data interface{}, timeout time.Duration)
 	return result, err
 }
 
-func (r *connection) Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
+func (r *Connection) Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
 	con := r.pool.Get()
 	defer con.Close() // nolint: errcheck
 	return receive(con, topic, timeout)
 }
 
-func (r *connection) Respond(topic string, data interface{}) error {
+func (r *Connection) Respond(topic string, data interface{}) error {
 	con := r.pool.Get()
 	defer con.Close() // nolint: errcheck
 	return send(con, topic, "", data)
