@@ -16,6 +16,8 @@ type Server struct {
 	e            endpoint.Endpoint
 	dec          DecodeRequestFunc
 	enc          EncodeResponseFunc
+	before       []ServerRequestFunc
+	after        []ServerResponseFunc
 	errorEncoder ErrorEncoder
 	logger       log.Logger
 }
@@ -41,8 +43,28 @@ func NewServer(
 	return s
 }
 
+// ServerRequestFunc functions are executed on the HTTP request object before the
+// request is decoded.
+type ServerRequestFunc func(ctx context.Context, req interface{}) context.Context
+
+// ServerResponseFunc functions are executed on the HTTP response writer after the
+// endpoint is invoked, but before anything is written to the client.
+type ServerResponseFunc func(ctx context.Context, res interface{}) context.Context
+
 // ServerOption sets an optional parameter for servers.
 type ServerOption func(*Server)
+
+// ServerBefore functions are executed on the HTTP request object before the
+// request is decoded.
+func ServerBefore(before ...ServerRequestFunc) ServerOption {
+	return func(s *Server) { s.before = append(s.before, before...) }
+}
+
+// ServerAfter functions are executed on the HTTP response writer after the
+// endpoint is invoked, but before anything is written to the client.
+func ServerAfter(after ...ServerResponseFunc) ServerOption {
+	return func(s *Server) { s.after = append(s.after, after...) }
+}
 
 // ServerErrorEncoder is used to encode errors whenever they're
 // encountered in the processing of a request. Clients can use this
@@ -60,6 +82,10 @@ func ServerLogger(logger log.Logger) ServerOption {
 
 // ServeRPC implements transport.Handler.
 func (s Server) ServeRPC(ctx context.Context, req interface{}) interface{} {
+	for _, f := range s.before {
+		ctx = f(ctx, req)
+	}
+
 	request, err := s.dec(ctx, req)
 	if err != nil {
 		level.Error(s.logger).Log("err", err, "context", "dec")
@@ -70,6 +96,10 @@ func (s Server) ServeRPC(ctx context.Context, req interface{}) interface{} {
 	if err != nil {
 		level.Error(s.logger).Log("err", err, "context", "endpoint")
 		return s.errorEncoder(ctx, err)
+	}
+
+	for _, f := range s.after {
+		ctx = f(ctx, response)
 	}
 
 	res, err := s.enc(ctx, response)
