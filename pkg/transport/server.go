@@ -24,7 +24,7 @@ func NewServer(conn Connection, receiveTimeout time.Duration, l log.Logger) *Ser
 	return &Server{
 		conn:           conn,
 		receiveTimeout: receiveTimeout,
-		l:              l,
+		logger:         l,
 		done:           make(chan struct{}),
 		m:              make(map[string]entry),
 	}
@@ -42,7 +42,7 @@ func NewServer(conn Connection, receiveTimeout time.Duration, l log.Logger) *Ser
 type Server struct {
 	conn           Connection
 	receiveTimeout time.Duration
-	l              log.Logger
+	logger         log.Logger
 
 	doneMu sync.Mutex
 	done   chan struct{}
@@ -102,7 +102,7 @@ func (s *Server) serve(ctx context.Context) {
 	defer s.mu.RUnlock()
 
 	for _, entry := range s.m {
-		level.Info(s.l).Log("serve", entry.topic)
+		level.Info(s.logger).Log("serve", entry.topic)
 		go s.handle(ctx, entry.topic, entry.h, entry.done)
 	}
 }
@@ -114,7 +114,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<
 		select {
 		case <-ctx.Done():
 			requests.Wait()
-			level.Info(s.l).Log("done", topic)
+			level.Info(s.logger).Log("done", topic)
 			done <- struct{}{}
 			return
 		default:
@@ -125,7 +125,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<
 			continue
 		}
 		if err != nil {
-			level.Error(s.l).Log("err", err)
+			level.Error(s.logger).Log("err", err)
 			continue
 		}
 
@@ -134,7 +134,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<
 			defer requests.Done()
 			defer func() {
 				if err := recover(); err != nil {
-					level.Error(s.l).Log("err", err, "serving", topic)
+					level.Error(s.logger).Log("err", err, "serving", topic)
 				}
 			}()
 
@@ -142,7 +142,7 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<
 			res := h.ServeRPC(ctx, data)
 			err = s.conn.Respond(replyTo, res)
 			if err != nil {
-				level.Error(s.l).Log("err", err)
+				level.Error(s.logger).Log("err", err)
 			}
 		}()
 	}
