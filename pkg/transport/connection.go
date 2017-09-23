@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const NoReply = ""
+
 // ErrInvalidResponse indicates corrupted response from a message broker.
 var ErrInvalidResponse = errors.New("invalid response")
 
@@ -13,12 +15,9 @@ var ErrTimeout = errors.New("timeout is reached")
 
 // Connection is a RPC over a message broker.
 type Connection interface {
-	// Send sends data to the space center from a satellite.
-	Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error)
+	// Send sends data to the topic.
+	Send(topic, replyTopic string, data interface{}) error
 
-	// Receive receives a message from a satellite.
-	Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error)
-
-	// Respond responds to Send called from a satellite.
-	Respond(topic string, data interface{}) error
+	// Receive receives data from the topic.
+	Receive(topic string, timeout time.Duration) (replyTopic string, data interface{}, err error)
 }

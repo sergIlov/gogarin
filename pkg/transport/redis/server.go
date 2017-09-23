@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/antonkuzmenko/gogarin/pkg/transport"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -14,8 +15,8 @@ import (
 // Server wraps an endpoint and implements a Handler.
 type Server struct {
 	e            endpoint.Endpoint
-	dec          DecodeRequestFunc
-	enc          EncodeResponseFunc
+	dec          transport.DecodeRequestFunc
+	enc          transport.EncodeResponseFunc
 	before       []ServerRequestFunc
 	after        []ServerResponseFunc
 	errorEncoder ErrorEncoder
@@ -26,8 +27,8 @@ type Server struct {
 // the provided endpoint.
 func NewServer(
 	e endpoint.Endpoint,
-	dec DecodeRequestFunc,
-	enc EncodeResponseFunc,
+	dec transport.DecodeRequestFunc,
+	enc transport.EncodeResponseFunc,
 	options ...ServerOption,
 ) *Server {
 	s := &Server{

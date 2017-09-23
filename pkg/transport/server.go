@@ -101,9 +101,9 @@ func (s *Server) serve(ctx context.Context) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	for _, entry := range s.m {
-		level.Info(s.logger).Log("serve", entry.topic)
-		go s.handle(ctx, entry.topic, entry.h, entry.done)
+	for _, item := range s.m {
+		level.Info(s.logger).Log("serve", item.topic)
+		go s.handle(ctx, item.topic, item.h, item.done)
 	}
 }
 
@@ -138,9 +138,8 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<
 				}
 			}()
 
-			// TODO: Add timeout for ServeRPC
 			res := h.ServeRPC(ctx, data)
-			err = s.conn.Respond(replyTo, res)
+			err = s.conn.Send(replyTo, NoReply, res)
 			if err != nil {
 				level.Error(s.logger).Log("err", err)
 			}
@@ -168,11 +167,11 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	for _, entry := range s.m {
+	for _, item := range s.m {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-entry.done:
+		case <-item.done:
 		}
 	}
 

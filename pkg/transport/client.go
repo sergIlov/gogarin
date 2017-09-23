@@ -1,15 +1,17 @@
-package redis
+package transport
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/oklog/ulid"
 )
 
 // Client wraps a topic and provides a method that implements endpoint.Endpoint.
 type Client struct {
-	conn           *Connection
+	conn           Connection
 	topic          string
 	receiveTimeout time.Duration
 	enc            EncodeRequestFunc
@@ -20,7 +22,7 @@ type Client struct {
 
 // NewClient constructs a usable Client for a single remote method.
 func NewClient(
-	conn *Connection,
+	conn Connection,
 	topic string,
 	receiveTimeout time.Duration,
 	enc EncodeRequestFunc,
@@ -53,7 +55,7 @@ type ClientResponseFunc func(ctx context.Context, res interface{}) context.Conte
 type ClientOption func(*Client)
 
 // SetConnection sets the underlying redis.Connection used for requests.
-func SetConnection(conn *Connection) ClientOption {
+func SetConnection(conn Connection) ClientOption {
 	return func(c *Client) { c.conn = conn }
 }
 
@@ -85,8 +87,17 @@ func (c Client) Endpoint() endpoint.Endpoint {
 			ctx = f(ctx, req)
 		}
 
-		response, err := c.conn.Send(c.topic, request, c.receiveTimeout)
+		replyTopic, err := createReplyTopic(c.topic)
+		if err != nil {
+			return nil, err
+		}
 
+		err = c.conn.Send(c.topic, replyTopic, request)
+		if err != nil {
+			return nil, err
+		}
+
+		_, response, err := c.conn.Receive(replyTopic, c.receiveTimeout)
 		if err != nil {
 			return nil, err
 		}
@@ -104,9 +115,13 @@ func (c Client) Endpoint() endpoint.Endpoint {
 	}
 }
 
-// EncodeJSONRequest is an EncodeRequestFunc that serializes the request as a
-// JSON object to the Request body. Many JSON-over-RPC services can use it as
-// a sensible default.
-func EncodeJSONRequest(ctx context.Context, req interface{}) error {
-	panic("todo")
+func createReplyTopic(topic string) (replyTopic string, err error) {
+	t := time.Now()
+	entropy := rand.New(rand.NewSource(t.UnixNano()))
+	id, err := ulid.New(ulid.Timestamp(t), entropy)
+	if err != nil {
+		return "", err
+	}
+
+	return topic + ":reply:" + id.String(), nil
 }

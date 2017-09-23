@@ -3,12 +3,10 @@ package redis
 import (
 	"encoding/base64"
 	"encoding/json"
-	"math/rand"
 	"time"
 
 	"github.com/antonkuzmenko/gogarin/pkg/transport"
 	"github.com/garyburd/redigo/redis"
-	"github.com/oklog/ulid"
 )
 
 // New creates a connection pool that implements transport.Connection.
@@ -66,68 +64,38 @@ type Config struct {
 }
 
 type message struct {
-	ReplyTo string      `json:"reply_to"`
-	Data    interface{} `json:"data"`
+	ReplyTopic string      `json:"reply_topic"`
+	Data       interface{} `json:"data"`
 }
 
 type Connection struct {
 	pool *redis.Pool
 }
 
-func (r *Connection) Send(topic string, data interface{}, timeout time.Duration) (result interface{}, err error) {
-	con := r.pool.Get()
-	defer con.Close() // nolint: errcheck
-
-	t := time.Now()
-	entropy := rand.New(rand.NewSource(t.UnixNano()))
-	id, err := ulid.New(ulid.Timestamp(t), entropy)
-	if err != nil {
-		return nil, err
-	}
-	replyTo := topic + ":reply:" + id.String()
-
-	err = send(con, topic, replyTo, data)
-	if err != nil {
-		return nil, err
-	}
-
-	_, result, err = receive(con, replyTo, timeout)
-
-	return result, err
-}
-
-func (r *Connection) Receive(topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
-	con := r.pool.Get()
-	defer con.Close() // nolint: errcheck
-	return receive(con, topic, timeout)
-}
-
-func (r *Connection) Respond(topic string, data interface{}) error {
-	con := r.pool.Get()
-	defer con.Close() // nolint: errcheck
-	return send(con, topic, "", data)
-}
-
-func send(con redis.Conn, topic, replyTo string, data interface{}) error {
+func (r *Connection) Send(topic, replyTopic string, data interface{}) (err error) {
 	const command = "LPUSH"
 
+	con := r.pool.Get()
+	defer con.Close() // nolint: errcheck
 	if con.Err() != nil {
 		return con.Err()
 	}
 
-	m := message{ReplyTo: replyTo, Data: data}
-	mbyte, err := json.Marshal(m)
+	m := message{ReplyTopic: replyTopic, Data: data}
+	msg, err := json.Marshal(m)
 	if err != nil {
 		return err
 	}
 
-	_, err = con.Do(command, topic, mbyte)
+	_, err = con.Do(command, topic, msg)
 	return err
 }
 
-func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo string, data interface{}, err error) {
+func (r *Connection) Receive(topic string, timeout time.Duration) (replyTopic string, data interface{}, err error) {
 	const command = "BRPOP"
 
+	con := r.pool.Get()
+	defer con.Close() // nolint: errcheck
 	if con.Err() != nil {
 		return "", nil, con.Err()
 	}
@@ -136,8 +104,8 @@ func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo strin
 	if err != nil {
 		return "", nil, err
 	}
-	bts, err := redis.ByteSlices(res, err)
 
+	result, err := redis.ByteSlices(res, err)
 	if err == redis.ErrNil {
 		return "", nil, transport.ErrTimeout
 	}
@@ -145,12 +113,12 @@ func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo strin
 		return "", nil, err
 	}
 
-	if len(bts) != 2 {
+	if len(result) != 2 {
 		return "", nil, transport.ErrInvalidResponse
 	}
 
 	var msg message
-	err = json.Unmarshal(bts[1], &msg)
+	err = json.Unmarshal(result[1], &msg)
 	if err != nil {
 		return "", nil, err
 	}
@@ -160,5 +128,5 @@ func receive(con redis.Conn, topic string, timeout time.Duration) (replyTo strin
 		return "", nil, err
 	}
 
-	return msg.ReplyTo, data, err
+	return msg.ReplyTopic, data, err
 }
