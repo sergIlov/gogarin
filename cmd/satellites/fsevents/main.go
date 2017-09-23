@@ -1,9 +1,10 @@
 package main
 
 import (
-	"log"
+	"os"
 
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
+	"github.com/go-kit/kit/log"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )
@@ -24,16 +25,14 @@ func main() {
 	var c satellite.Config
 	err = envconfig.Process("gogarin_satellite", &c)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	rpc, err := satellite.NewRPC(c.RPC)
-	if err != nil {
-		log.Fatal(err)
-	}
+	logger := newLogger(c)
+	conn := satellite.NewConnection(c, logger)
 
 	sat := satellite.New(
-		rpc,
+		conn,
 		satellite.Info{
 			Name:        "File System Events",
 			Version:     "0.1.0-alpha",
@@ -55,9 +54,36 @@ func main() {
 		},
 	)
 
-	err = sat.Start()
+	err = sat.Start(c)
 	if err != nil {
 		panic(err)
 	}
 	sat.Stop()
+}
+
+const (
+	jsonLogger   = "json"
+	logfmtLogger = "logfmt"
+)
+
+func newLogger(c satellite.Config) log.Logger {
+	var logger log.Logger
+
+	switch c.Logger {
+	case jsonLogger:
+		logger = log.NewJSONLogger(log.NewSyncWriter(os.Stderr))
+	case logfmtLogger:
+		logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
+	default:
+		panic("invalid logger format: " + c.Logger)
+	}
+
+	logger = log.With(
+		logger,
+		"ts", log.DefaultTimestampUTC,
+		"version", version,
+		"commit", commit,
+		"build_ts", buildTime,
+	)
+	return logger
 }

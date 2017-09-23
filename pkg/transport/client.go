@@ -73,7 +73,7 @@ func ClientAfter(after ...ClientResponseFunc) ClientOption {
 }
 
 // Endpoint returns a usable endpoint that invokes the remote endpoint.
-func (c Client) Endpoint() endpoint.Endpoint {
+func (c *Client) Endpoint() endpoint.Endpoint {
 	return func(ctx context.Context, req interface{}) (res interface{}, err error) {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
