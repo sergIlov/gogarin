@@ -7,6 +7,8 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"fmt"
+	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
 )
 
 func FileCreated() {}
