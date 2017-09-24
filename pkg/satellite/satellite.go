@@ -1,26 +1,26 @@
 package satellite
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"time"
 
 	"github.com/antonkuzmenko/gogarin/pkg/transport"
 )
 
 type Config struct {
-	RPC RPCConfig
+	RPC    RPCConfig
+	Logger string `default:"json"`
 }
 
 func New(r transport.Connection, i Info) *Satellite {
 	return &Satellite{
-		client: r,
-		Info:   i,
+		conn: r,
+		Info: i,
 	}
 }
 
 type Satellite struct {
-	client   transport.Connection
+	conn     transport.Connection
 	Info     Info
 	Triggers []Trigger
 	Actions  []Action
@@ -34,22 +34,15 @@ func (s *Satellite) AddAction(a Action) {
 	s.Actions = append(s.Actions, a)
 }
 
-func (s *Satellite) Start() error {
-	d, err := json.Marshal(s.Info)
+func (s *Satellite) Start(c Config) error {
+	registerEndpoint := createRegisterEndpoint(c, s.conn)
+	res, err := registerEndpoint(context.TODO(), s.Info)
 	if err != nil {
 		return err
 	}
-	res, err := s.client.Send("satellite.register", d, time.Duration(1)*time.Second)
-	if err != nil {
-		return err
-	}
-	r := res.([]byte)
-	var i Info
-	err = json.Unmarshal(r, &i)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%+v", i)
+
+	info := res.(Info)
+	fmt.Printf("%+v", info)
 	return nil
 }
 

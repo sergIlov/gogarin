@@ -20,13 +20,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// set by release script, see Makefile
-var (
-	version   = "dev"
-	commit    string
-	buildTime string
-)
-
 type Config struct {
 	RPC struct {
 		Adapter             string `required:"true"`
@@ -93,7 +86,12 @@ func main() {
 		log.With(logger, "component", "transport.Server"),
 	)
 	server.Handle("satellite.register", register)
-	go server.Serve()
+	go func() {
+		er := server.Serve()
+		if er != transport.ErrServerClosed {
+			level.Error(log.With(logger, "component", "transport.Server")).Log("err", er, "context", "Serve")
+		}
+	}()
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)

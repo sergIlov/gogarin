@@ -20,13 +20,13 @@ type Handler interface {
 }
 
 // NewServer constructs new RPC server.
-func NewServer(conn Connection, pullTimeout time.Duration, l log.Logger) *Server {
+func NewServer(conn Connection, receiveTimeout time.Duration, l log.Logger) *Server {
 	return &Server{
-		conn:        conn,
-		pollTimeout: pullTimeout,
-		l:           l,
-		done:        make(chan struct{}),
-		m:           make(map[string]entry),
+		conn:           conn,
+		receiveTimeout: receiveTimeout,
+		logger:         l,
+		done:           make(chan struct{}),
+		m:              make(map[string]entry),
 	}
 }
 
@@ -35,14 +35,14 @@ func NewServer(conn Connection, pullTimeout time.Duration, l log.Logger) *Server
 // topics and calls the corresponding handler.
 //
 // Server uses log polling for getting new request from a message broker.
-// pollTimeout sets the limit for waiting for new messages.
+// receiveTimeout sets the limit for waiting for new messages.
 // Be careful with this setting, setting it to a high value would block the Shutdown.
-// The rule of thumb is to keep pollTimeout small enough for a faster Shutdown
+// The rule of thumb is to keep receiveTimeout small enough for a faster Shutdown
 // and large enough to not flood your message broker with a large number of requests.
 type Server struct {
-	conn        Connection
-	pollTimeout time.Duration
-	l           log.Logger
+	conn           Connection
+	receiveTimeout time.Duration
+	logger         log.Logger
 
 	doneMu sync.Mutex
 	done   chan struct{}
@@ -101,9 +101,9 @@ func (s *Server) serve(ctx context.Context) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	for _, entry := range s.m {
-		level.Info(s.l).Log("serve", entry.topic)
-		go s.handle(ctx, entry.topic, entry.h, entry.done)
+	for _, item := range s.m {
+		level.Info(s.logger).Log("serve", item.topic)
+		go s.handle(ctx, item.topic, item.h, item.done)
 	}
 }
 
@@ -114,18 +114,18 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<
 		select {
 		case <-ctx.Done():
 			requests.Wait()
-			level.Info(s.l).Log("done", topic)
+			level.Info(s.logger).Log("done", topic)
 			done <- struct{}{}
 			return
 		default:
 		}
 
-		replyTo, data, err := s.conn.Receive(topic, s.pollTimeout)
+		replyTo, data, err := s.conn.Receive(topic, s.receiveTimeout)
 		if err == ErrTimeout {
 			continue
 		}
 		if err != nil {
-			level.Error(s.l).Log("err", err)
+			level.Error(s.logger).Log("err", err)
 			continue
 		}
 
@@ -134,15 +134,14 @@ func (s *Server) handle(ctx context.Context, topic string, h Handler, done chan<
 			defer requests.Done()
 			defer func() {
 				if err := recover(); err != nil {
-					level.Error(s.l).Log("err", err, "serving", topic)
+					level.Error(s.logger).Log("err", err, "serving", topic)
 				}
 			}()
 
-			// TODO: Add timeout for ServeRPC
 			res := h.ServeRPC(ctx, data)
-			err = s.conn.Respond(replyTo, res)
+			err = s.conn.Send(replyTo, NoReply, res)
 			if err != nil {
-				level.Error(s.l).Log("err", err)
+				level.Error(s.logger).Log("err", err)
 			}
 		}()
 	}
@@ -168,11 +167,11 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	for _, entry := range s.m {
+	for _, item := range s.m {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-entry.done:
+		case <-item.done:
 		}
 	}
 
