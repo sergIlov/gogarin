@@ -21,7 +21,7 @@ import (
 )
 
 type Config struct {
-	RPC struct {
+	Transport struct {
 		Adapter             string `required:"true"`
 		Redis               redis.Config
 		PollTimeoutInMs     int `default:"2000"`
@@ -82,7 +82,7 @@ func main() {
 	)
 	server := transport.NewServer(
 		conn,
-		time.Duration(config.RPC.PollTimeoutInMs)*time.Millisecond,
+		time.Duration(config.Transport.PollTimeoutInMs)*time.Millisecond,
 		log.With(logger, "component", "transport.Server"),
 	)
 	server.Handle("satellite.register", register)
@@ -100,7 +100,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(
 		context.Background(),
-		time.Duration(config.RPC.ShutdownTimeoutInMs)*time.Millisecond,
+		time.Duration(config.Transport.ShutdownTimeoutInMs)*time.Millisecond,
 	)
 	defer cancel()
 
@@ -142,11 +142,11 @@ const (
 )
 
 func newConn(c Config, l log.Logger) transport.Connection {
-	if c.RPC.Adapter == redisRPC {
-		return redis.New(c.RPC.Redis)
+	if c.Transport.Adapter == redisRPC {
+		return redis.New(c.Transport.Redis)
 	}
 
-	level.Error(l).Log("err", "invalid Transport.Adapter", "adapter", c.RPC.Adapter)
+	level.Error(l).Log("err", "invalid Transport.Adapter", "adapter", c.Transport.Adapter)
 	os.Exit(1)
 	return nil
 }

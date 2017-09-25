@@ -47,7 +47,7 @@ func main() {
 	)
 
 	f := FileCreatedFields()
-	fmt.Print(f)
+	fmt.Println(f)
 
 	sat.AddTrigger(
 		satellite.Trigger{
