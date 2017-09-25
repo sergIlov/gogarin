@@ -1,14 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
+	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
 	"github.com/go-kit/kit/log"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"fmt"
-	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
 )
 
 func FileCreated() {}
@@ -76,7 +76,7 @@ func main() {
 			},
 		},
 	)
-	
+
 	err = sat.Start(c)
 	if err != nil {
 		panic(err)

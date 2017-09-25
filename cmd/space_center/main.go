@@ -3,13 +3,13 @@ package main
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"database/sql"
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
 	"github.com/antonkuzmenko/gogarin/pkg/transport"
 	"github.com/antonkuzmenko/gogarin/pkg/transport/redis"
