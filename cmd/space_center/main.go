@@ -104,20 +104,6 @@ func main() {
 }
 
 const (
-	redisRPC = "redis"
-)
-
-func newConn(c Config, l log.Logger) transport.Connection {
-	if c.RPC.Adapter == redisRPC {
-		return redis.New(c.RPC.Redis)
-	}
-
-	level.Error(l).Log("err", "invalid RPC.Adapter", "adapter", c.RPC.Adapter)
-	os.Exit(1)
-	return nil
-}
-
-const (
 	jsonLogger   = "json"
 	logfmtLogger = "logfmt"
 )
@@ -142,4 +128,18 @@ func newLogger(c Config) log.Logger {
 		"build_ts", buildTime,
 	)
 	return logger
+}
+
+const (
+	redisRPC = "redis"
+)
+
+func newConn(c Config, l log.Logger) transport.Connection {
+	if c.RPC.Adapter == redisRPC {
+		return redis.New(c.RPC.Redis)
+	}
+
+	level.Error(l).Log("err", "invalid Transport.Adapter", "adapter", c.RPC.Adapter)
+	os.Exit(1)
+	return nil
 }
