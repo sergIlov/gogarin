@@ -4,3 +4,13 @@ services:
     image: redis:4-alpine
     ports:
       - 6379:6379
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: gogarin
+      POSTGRES_PASSWORD: gogarin
+      POSTGRES_DB: gogarin_space_center
+    volumes:
+      - /usr/local/share/postgresql:/var/lcib/postgresql
