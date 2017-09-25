@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
-	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
+	"github.com/antonkuzmenko/gogarin/pkg/schema"
 	"github.com/go-kit/kit/log"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
