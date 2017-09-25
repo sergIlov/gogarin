@@ -2,14 +2,13 @@ package satellite
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/antonkuzmenko/gogarin/pkg/transport"
 )
 
 type Config struct {
-	RPC    RPCConfig
-	Logger string `default:"json"`
+	Transport TransportConfig
+	Logger    string `default:"json"`
 }
 
 func New(r transport.Connection, i Info) *Satellite {
@@ -30,15 +29,9 @@ func (s *Satellite) AddTrigger(t Trigger) {
 }
 
 func (s *Satellite) Start(c Config) error {
-	registerEndpoint := createRegisterEndpoint(c, s.conn)
-	res, err := registerEndpoint(context.TODO(), s.Info)
-	if err != nil {
-		return err
-	}
-
-	info := res.(Info)
-	fmt.Printf("%+v", info)
-	return nil
+	registerEndpoint := makeRegisterEndpoint(c, s.conn)
+	_, err := registerEndpoint(context.TODO(), s.Info)
+	return err
 }
 
 func (s *Satellite) Stop() {
