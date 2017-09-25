@@ -7,6 +7,8 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"fmt"
+	"github.com/antonkuzmenko/gogarin/pkg/satellite/schema"
 )
 
 func FileCreated() {}
@@ -14,6 +16,10 @@ func FileCreated() {}
 type FileCreatedConfig struct {
 	Path      []string `json:"path" desc:"Path to the file or directory."`
 	Recursive bool     `json:"recursive" desc:"Triggers when a new file is created n-tiers down the directory tree."`
+}
+
+type AppendFileConfig struct {
+	Path string `json:"path" desc:"Path to the file"`
 }
 
 func main() {
@@ -40,6 +46,9 @@ func main() {
 		},
 	)
 
+	f := FileCreatedFields()
+	fmt.Print(f)
+
 	sat.AddTrigger(
 		satellite.Trigger{
 			Call: FileCreated,
@@ -54,6 +63,20 @@ func main() {
 		},
 	)
 
+	sat.AddAction(
+		satellite.Action{
+			Call: func() {},
+			Info: satellite.AbilityInfo{
+				Name:        "Append file",
+				Description: "Append the specified file",
+			},
+			Config: AppendFileConfig{},
+			Validator: func(config interface{}) {
+
+			},
+		},
+	)
+	
 	err = sat.Start(c)
 	if err != nil {
 		panic(err)
@@ -86,4 +109,26 @@ func newLogger(c satellite.Config) log.Logger {
 		"build_ts", buildTime,
 	)
 	return logger
+}
+
+func FileCreatedFields() schema.Fields {
+	return schema.Fields{
+		"file": &schema.Field{
+			Name:        "File",
+			Type:        schema.Object,
+			Description: "Created file or directory",
+			Fields: schema.Fields{
+				"name": &schema.Field{
+					Name:        "File.Name",
+					Type:        schema.String,
+					Description: "Name of created file or directory",
+				},
+				"type": &schema.Field{
+					Name:        "File.Type",
+					Type:        schema.String,
+					Description: "Name of created object (file or directory)",
+				},
+			},
+		},
+	}
 }

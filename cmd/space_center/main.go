@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"database/sql"
 	"github.com/antonkuzmenko/gogarin/pkg/satellite"
 	"github.com/antonkuzmenko/gogarin/pkg/transport"
 	"github.com/antonkuzmenko/gogarin/pkg/transport/redis"
@@ -16,6 +17,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	_ "github.com/lib/pq"
 )
 
 type Config struct {
@@ -25,7 +27,11 @@ type Config struct {
 		PollTimeoutInMs     int `default:"2000"`
 		ShutdownTimeoutInMs int `default:"30000"`
 	}
-	Logger string `default:"json"`
+	Logger   string `default:"json"`
+	Database struct {
+		Driver string `required:"true"`
+		URL    string `required:"true"`
+	}
 }
 
 func main() {
@@ -42,6 +48,7 @@ func main() {
 
 	logger := newLogger(config)
 	conn := newConn(config, logger)
+	_ = openDBConnection(config, logger)
 
 	enc := func(ctx context.Context, res interface{}) (response interface{}, err error) {
 		var buf bytes.Buffer
@@ -142,4 +149,24 @@ func newLogger(c Config) log.Logger {
 		"build_ts", buildTime,
 	)
 	return logger
+}
+
+const (
+	postgresDBDriver = "postgres"
+)
+
+func openDBConnection(c Config, l log.Logger) *sql.DB {
+	if c.Database.Driver == postgresDBDriver {
+		db, err := sql.Open(postgresDBDriver, c.Database.URL)
+
+		if err != nil {
+			level.Error(l).Log("error", err, "driver", c.Database.Driver)
+			os.Exit(1)
+		}
+		return db
+	}
+
+	level.Error(l).Log("error", "Invalid Database.Driver", "driver", c.Database.Driver)
+	os.Exit(1)
+	return nil
 }
